@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useOrdersStore } from "@/lib/store/orders"
+import { useOrderStore } from "@/lib/store/orders"
 import { products } from "@/lib/data/products"
 import { 
   DollarSign, 
@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 
 export default function AdminDashboard() {
-  const { orders } = useOrdersStore()
+  const { orders } = useOrderStore()
   
   const stats = {
     totalRevenue: orders.reduce((sum, o) => sum + o.total, 0),

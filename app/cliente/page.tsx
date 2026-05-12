@@ -5,17 +5,17 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { useAuthStore } from "@/lib/store/auth"
-import { useOrdersStore } from "@/lib/store/orders"
+import { useOrderStore } from "@/lib/store/orders"
 import { orderStatusLabels } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { 
-  User, 
-  Package, 
-  MapPin, 
+import {
+  User,
+  Package,
+  MapPin,
   LogOut,
   Clock,
   CheckCircle,
@@ -47,7 +47,7 @@ const statusColors: Record<string, string> = {
 export default function CustomerDashboard() {
   const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
-  const { getOrdersByUser } = useOrdersStore()
+  const { getOrdersByUser } = useOrderStore()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function CustomerDashboard() {
     )
   }
 
-  const orders = getOrdersByUser(user.id)
+  const orders = getOrdersByUser(user.email)
 
   const handleLogout = () => {
     logout()
@@ -86,9 +86,10 @@ export default function CustomerDashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       <main className="flex-1 pt-20 md:pt-24">
         <div className="container mx-auto px-6 py-12">
-          {/* Header */}
+
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-2">
@@ -98,13 +99,13 @@ export default function CustomerDashboard() {
                 Gerencie seus pedidos e dados
               </p>
             </div>
+
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Sair
             </Button>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <Card>
               <CardContent className="pt-6">
@@ -119,6 +120,7 @@ export default function CustomerDashboard() {
                 </div>
               </CardContent>
             </Card>
+
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
@@ -134,6 +136,7 @@ export default function CustomerDashboard() {
                 </div>
               </CardContent>
             </Card>
+
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
@@ -151,7 +154,6 @@ export default function CustomerDashboard() {
             </Card>
           </div>
 
-          {/* Tabs */}
           <Tabs defaultValue="orders" className="w-full">
             <TabsList>
               <TabsTrigger value="orders">Meus Pedidos</TabsTrigger>
@@ -159,7 +161,6 @@ export default function CustomerDashboard() {
               <TabsTrigger value="addresses">Endereços</TabsTrigger>
             </TabsList>
 
-            {/* Orders Tab */}
             <TabsContent value="orders" className="mt-6">
               {orders.length > 0 ? (
                 <div className="space-y-4">
@@ -173,34 +174,31 @@ export default function CustomerDashboard() {
                               Realizado em {formatDate(order.createdAt)}
                             </CardDescription>
                           </div>
+
                           <Badge className={`w-fit ${statusColors[order.status]}`}>
                             {statusIcons[order.status]}
                             <span className="ml-1">{orderStatusLabels[order.status]}</span>
                           </Badge>
                         </div>
                       </CardHeader>
+
                       <CardContent>
                         <div className="space-y-3">
                           {order.items.map((item, index) => (
                             <div key={index} className="flex justify-between text-sm">
                               <span className="text-muted-foreground">
-                                {item.quantity}x {item.product.name}
-                                {item.product.isRental && ` (${item.rentalDays} dias)`}
+                                {item.quantity}x {item.productName}
+                                {item.rentalDays && ` (${item.rentalDays} dias)`}
                               </span>
+
                               <span>
-                                R$ {(
-                                  (item.product.isRental 
-                                    ? item.product.rentalPrice! * (item.rentalDays || 1) 
-                                    : item.product.price) * item.quantity
-                                ).toFixed(2).replace(".", ",")}
+                                R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
                               </span>
                             </div>
                           ))}
+
                           <Separator />
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Frete</span>
-                            <span>R$ {order.freight.toFixed(2).replace(".", ",")}</span>
-                          </div>
+
                           <div className="flex justify-between font-semibold">
                             <span>Total</span>
                             <span className="text-primary">
@@ -208,17 +206,18 @@ export default function CustomerDashboard() {
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="mt-4 pt-4 border-t border-border">
                           <div className="flex items-start gap-2 text-sm text-muted-foreground">
                             <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
                             <span>
-                              {order.address.street}, {order.address.number}
-                              {order.address.complement && ` - ${order.address.complement}`}
+                              {order.deliveryAddress.street}, {order.deliveryAddress.number}
+                              {order.deliveryAddress.complement && ` - ${order.deliveryAddress.complement}`}
                               <br />
-                              {order.address.neighborhood}, {order.address.city} - {order.address.state}
+                              {order.deliveryAddress.neighborhood}, {order.deliveryAddress.city} - {order.deliveryAddress.state}
                             </span>
                           </div>
+
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                             <Clock className="h-4 w-4 shrink-0" />
                             <span>
@@ -246,7 +245,6 @@ export default function CustomerDashboard() {
               )}
             </TabsContent>
 
-            {/* Profile Tab */}
             <TabsContent value="profile" className="mt-6">
               <Card>
                 <CardHeader>
@@ -255,16 +253,19 @@ export default function CustomerDashboard() {
                     Meus Dados
                   </CardTitle>
                 </CardHeader>
+
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Nome</p>
                       <p className="font-medium">{user.name}</p>
                     </div>
+
                     <div>
                       <p className="text-sm text-muted-foreground">E-mail</p>
                       <p className="font-medium">{user.email}</p>
                     </div>
+
                     <div>
                       <p className="text-sm text-muted-foreground">Telefone</p>
                       <p className="font-medium">{user.phone}</p>
@@ -274,7 +275,6 @@ export default function CustomerDashboard() {
               </Card>
             </TabsContent>
 
-            {/* Addresses Tab */}
             <TabsContent value="addresses" className="mt-6">
               <Card>
                 <CardHeader>
@@ -283,6 +283,7 @@ export default function CustomerDashboard() {
                     Endereços Salvos
                   </CardTitle>
                 </CardHeader>
+
                 <CardContent>
                   {user.addresses.length > 0 ? (
                     <div className="space-y-4">
@@ -292,9 +293,11 @@ export default function CustomerDashboard() {
                             {address.street}, {address.number}
                             {address.complement && ` - ${address.complement}`}
                           </p>
+
                           <p className="text-sm text-muted-foreground">
                             {address.neighborhood}, {address.city} - {address.state}
                           </p>
+
                           <p className="text-sm text-muted-foreground">
                             CEP: {address.cep}
                           </p>
@@ -312,9 +315,11 @@ export default function CustomerDashboard() {
                 </CardContent>
               </Card>
             </TabsContent>
+
           </Tabs>
         </div>
       </main>
+
       <Footer />
     </div>
   )
