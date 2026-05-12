@@ -42,18 +42,30 @@ export interface OrderAddress {
   state: string
 }
 
+export interface OrderItem {
+  product: string
+  productName: string
+  quantity: number
+  price: number
+  rentalDays?: number
+}
+
 export interface Order {
   id: string
-  items: CartItem[]
-  address: OrderAddress
+  items: OrderItem[]
+  total: number
+  status: OrderStatus
+  paymentMethod: string
+  paymentStatus: string
+  deliveryAddress: OrderAddress
   eventDate: string
   eventTime: string
   observations?: string
-  freight: number
-  total: number
-  status: OrderStatus
+  customerName: string
+  customerEmail: string
+  customerPhone: string
+
   createdAt: string
-  userId: string
 }
 
 export type OrderStatus = 

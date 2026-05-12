@@ -170,7 +170,7 @@ export default function CheckoutPage() {
     // Salva o pedido
     addOrder({
       items: items.map(item => ({
-        productId: item.product.id,
+        product: item.product.id,
         productName: item.product.name,
         quantity: item.quantity,
         price: item.product.isRental 
@@ -179,7 +179,7 @@ export default function CheckoutPage() {
         rentalDays: item.rentalDays,
       })),
       total: paymentCalc.total,
-      status: "pending",
+      status: "em_analise",
       paymentMethod: selectedPayment,
       paymentStatus: "pending",
       deliveryAddress: {
